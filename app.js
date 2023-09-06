@@ -1,130 +1,90 @@
-// globals
+import { drawPaddle, paddleFactory, updataPaddle } from "./paddle.js";
+import { drawBricks, generateBricks } from './bricks.js'
+
+//* Globals
 /**@type {HTMLCanvasElement} */
 const canvas = document.getElementById("canvas");
+
 /**@type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
+
 /**@type {number} */
 let timestamp = Date.now();
+
 /**@type {number} */
 let deltaTime;
+
+/**@type {number} */
 let velocity = 0;
 
+/**@typedef {import('./paddle.js').Paddle} _paddle @type {_paddle}*/
+let paddle;
 
-const classicColors = ["red", "orange", "green", "yellow"];
-
-const rowColors = ["blue", "white", "orange", "pink"];
-
+const bricks = generateBricks(14, 8);
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBricks(bricks);
   deltaTime = Date.now();
   /**@type {number} the time that has passed between frames in milliseconds */
   const delta = timestamp - deltaTime;
   timestamp = deltaTime;
 
-  // do something every frame
-  paddlePos.x = paddlePos.x + velocity * delta;
-  paddle(ctx, paddlePos, canvas.width, canvas.height);
+  // draw the bricks
+  drawBricks(ctx, canvas.width, canvas.height, bricks);
+
+  // do stuff with paddle object
+  updataPaddle(canvas.width, canvas.height, paddle, velocity, delta)
+  drawPaddle(ctx, paddle, canvas.width, canvas.height);
+
   // next frame
   requestAnimationFrame(loop);
 }
 
-/**
- * generate a brick array of variable width and height
- * @param {number} width
- * @param {number} height
- * @param {string} brickColor
- * @returns {array[]} brickArray
- */
-function generateBricks(width, height) {
-  const brickArray = [];
-  let brickColor = -1;
-  for (let row = 0; row < height; row++) {
-    const newRow = [];
-    if (row % 2 == 0) brickColor++;
-    for (let col = 0; col < width; col++) {
-      //TODO: Add code function logic to get color index from rowColors
-      newRow.push(brickColor);
-    }
-
-    brickArray.push(newRow);
-  }
-
-  return brickArray;
-}
-
-let bricks = generateBricks(14, 8);
-console.table(bricks);
-drawBricks(bricks);
-
-
-
-
-
-// row %
-/*let bricks = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-              [1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
- */
-
-function drawBricks(bArr) {
-    const gap = 2; 
-    let curX = gap;
-    let curY = gap;
-
-    
-    const brickWidth = Math.floor(((canvas.width - gap) - (bArr[0].length * gap)) / bArr[0].length) ;
-    const brickHeight = 6;
-
-
-    for (let row = 0; row < bArr.length; row++) {
-        for (let col = 0; col < bArr[row].length; col++) {
-            ctx.fillStyle = rowColors[bArr[row][col]];
-            ctx.fillRect(curX, curY, brickWidth, brickHeight);
-            curX += brickWidth + gap;
-           //console.log("X: " + curX + " Y: " + curY);
-        }
-        curX = gap;
-        curY += brickHeight + gap;
-    }
-}
-
-
-
-loop();
-
-/*
-
-addEventListener("keydown", function (e) {
-    //   console.log(e.code);
-    switch (e.code) {
-      case "ArrowRight":
-      case "KeyD":
-        rotateCar(car, 5, delta)
-        break;
-      case "ArrowLeft":
-      case "KeyA":
-        rotateCar(car, -5, delta)
-        break;
-
-
-
-        addEventListener("keyup", function (e) {
+//* Handlers
+function handleKeyUp(e) {
+  // if (e.code !== && e.code !== )
   switch (e.code) {
     case "ArrowRight":
     case "KeyD":
+      if (velocity < 0) velocity = 0;
       break;
     case "ArrowLeft":
     case "KeyA":
+      if (velocity > 0) velocity = 0;
       break;
-        
-        
-        
-        
-        */
+  }
+}
+
+function handleKeyDown(e) {
+  const speed = canvas.width * .001;
+  switch (e.code) {
+    case "ArrowRight":
+    case "KeyD":
+      velocity = -speed;
+      break;
+    case "ArrowLeft":
+    case "KeyA":
+      velocity = speed;
+      break;
+  }
+}
+
+function handleResize() {
+  canvas.height = window.innerHeight - 50
+  canvas.width = window.innerWidth - 50
+}
+
+//* all setup should be here
+function init() {
+  addEventListener("resize", handleResize)
+  addEventListener("keyup", handleKeyUp);
+  addEventListener("keydown", handleKeyDown);
+  
+  handleResize()
+  paddle = paddleFactory(canvas.width, canvas.height)
+  
+  loop();
+}
+
+//* start running script
+init()
