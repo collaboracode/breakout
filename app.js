@@ -1,4 +1,5 @@
-import { drawPaddle, paddleFactory, updataPaddle } from "./paddle.js";
+ import { drawPaddle, paddleFactory, updataPaddle } from "./paddle.js";
+import { drawBall, ballFactory, updateBall } from "./ball.js";
 import { drawBricks, generateBricks } from './bricks.js'
 
 //* Globals
@@ -14,11 +15,13 @@ let timestamp = Date.now();
 /**@type {number} */
 let deltaTime;
 
-/**@type {number} */
-let velocity = 0;
+// /**@type {number} */
+// let velocity = 0;
 
 /**@typedef {import('./paddle.js').Paddle} _paddle @type {_paddle}*/
 let paddle;
+/**@typedef {import('./ball.js').Ball} _ball @type {_ball}*/
+let ball;
 
 const bricks = generateBricks(14, 8);
 
@@ -31,11 +34,14 @@ function loop() {
 
   // draw the bricks
   drawBricks(ctx, canvas.width, canvas.height, bricks);
-
+  
   // do stuff with paddle object
-  updataPaddle(canvas.width, canvas.height, paddle, velocity, delta)
+  updataPaddle(canvas.width, canvas.height, paddle, delta)
   drawPaddle(ctx, paddle, canvas.width, canvas.height);
-
+  updateBall(ball, paddle, {x: canvas.width, y: canvas.height}, delta, bricks)
+  drawBall(ctx, ball)
+  
+  
   // next frame
   requestAnimationFrame(loop);
 }
@@ -46,26 +52,38 @@ function handleKeyUp(e) {
   switch (e.code) {
     case "ArrowRight":
     case "KeyD":
-      if (velocity < 0) velocity = 0;
+      if (paddle.velocity < 0) paddle.velocity = 0;
       break;
     case "ArrowLeft":
     case "KeyA":
-      if (velocity > 0) velocity = 0;
+      if (paddle.velocity > 0) paddle.velocity = 0;
       break;
+
   }
 }
 
 function handleKeyDown(e) {
   const speed = canvas.width * .001;
+  const ballSpeed = canvas.width * .0001;
   switch (e.code) {
     case "ArrowRight":
     case "KeyD":
-      velocity = -speed;
+      paddle.velocity = -speed;
       break;
     case "ArrowLeft":
     case "KeyA":
-      velocity = speed;
+      paddle.velocity = speed;
       break;
+    case "Space":
+      // Launch ball (if it is not moving)
+        if (ball.velocity.x === 0 && ball.velocity.y  === 0) {
+          ball.velocity.y = ballSpeed
+          ball.velocity.x =  paddle.velocity / 2 // todo refactor to paddle.velocity.x
+
+
+          console.log('fire! - ' + ball.velocity.x + ' ' + ball.velocity.y)
+        }
+        break;
   }
 }
 
@@ -82,7 +100,8 @@ function init() {
   
   handleResize()
   paddle = paddleFactory(canvas.width, canvas.height)
-  
+  ball = ballFactory(canvas.width, canvas.height, paddle)
+
   loop();
 }
 

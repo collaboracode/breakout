@@ -5,6 +5,7 @@
  * @prop {number} y
  * @prop {number} height
  * @prop {number} width
+ * @prop {number} velocity x velocity
  */
 
 /**
@@ -31,14 +32,13 @@ export function drawPaddle(ctx, paddleData, canvasWidth) {
  * @param {number} canvasWidth 
  * @param {number} canvasHeight 
  * @param {Paddle} paddleData 
- * @param {number} velocity 
  * @param {number} delta
  * @returns {void} 
  */
-export function updataPaddle(canvasWidth, canvasHeight, paddleData, velocity, delta) {
+export function updataPaddle(canvasWidth, canvasHeight, paddleData, delta) {
   paddleData.width = Math.floor(canvasWidth / 8);
   paddleData.height = Math.floor(paddleData.width / 3);
-  paddleData.x = paddleData.x + (velocity * delta);
+  paddleData.x = paddleData.x + (paddleData.velocity * delta);
   paddleData.y = Math.floor(canvasHeight - paddleData.height - 10);
 }
 
@@ -57,5 +57,6 @@ export function paddleFactory(canvasWidth, canvasHeight) {
     y: Math.floor(canvasHeight - height - 20),
     width: Math.floor(canvasWidth / 8),
     height: Math.floor(width / 3),
+    velocity: {x: 0, y: 0}
   }
 }
