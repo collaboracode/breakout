@@ -60,7 +60,7 @@ export function generateBricks(width, height) {
  */
 export function brickCollision(canvasWidth, canvasHeight, ball, bArr) {
     const gap = 2;
-
+    
     const brickWidth = Math.floor(((canvasWidth - gap) - (bArr[0].length * gap)) / bArr[0].length);
     const brickHeight = Math.floor(canvasHeight * .05);
 
@@ -71,6 +71,8 @@ export function brickCollision(canvasWidth, canvasHeight, ball, bArr) {
         const row = Math.floor(ball.y / (brickHeight + gap));
         const col = Math.floor(ball.x / (brickWidth + gap));
         // Does brick exist here?
+
+        // TODO: Proper check for x collision also so we only reverse the correct velocities
         if (row >= 0 && col >= 0 && row <= bArr.length && col <= bArr[0].length ) {
           if (bArr[row][col] !== -1) {
             ball.velocity.y = -ball.velocity.y;

@@ -41,6 +41,8 @@ function loop(timestamp) {
     updateBall(ball, paddle, {x: canvas.width, y: canvas.height}, delta, bricks)
     drawBall(ctx, ball)
     
+    // TODO: Check for Win condition (no bricks left)
+
     
   }
   // next frame
