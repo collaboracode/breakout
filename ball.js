@@ -6,6 +6,7 @@ import { brickCollision } from "./bricks.js";
  * @prop {number} height
  * @prop {number} width
  * @prop {{x: number, y: number}} velocity
+ * @prop {number} maxSpeed
  */
 
 
@@ -37,7 +38,8 @@ export function ballFactory(canvasWidth, canvasHeight, paddleData) {
     width: size,
     height: size,
     velocity: { x: 0, y: 0 },
-    launched: false
+    launched: false,
+    maxSpeed: 1
   }
 }
 
@@ -59,7 +61,6 @@ export function updateBall(ballData, paddleData, bounds, delta, brickArray) {
   } else {
     ballData.y = ballData.y + (ballData.velocity.y * delta);
     ballData.x = ballData.x + (ballData.velocity.x * delta);
-
   }
 
   // left bound
@@ -93,8 +94,17 @@ export function updateBall(ballData, paddleData, bounds, delta, brickArray) {
     && ballData.y + ballData.height > paddleData.y 
     ) {
       ballData.velocity.y = -ballData.velocity.y
-      ballData.velocity.x = ballData.velocity.x + paddleData.velocity
-      // ballData.y = -ballData.y
+      const newXSpeed = ballData.velocity.x + paddleData.velocity
+      if (newXSpeed > ballData.maxSpeed) {
+        ballData.velocity.x = ballData.maxSpeed
+      }
+      else if (newXSpeed < -ballData.maxSpeed) {
+        ballData.velocity.x = -ballData.maxSpeed
+      }
+      else {
+        ballData.velocity.x = newXSpeed
+      }
+
     }
 
     brickCollision(bounds.x, bounds.y, ballData, brickArray)

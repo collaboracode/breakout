@@ -5,7 +5,7 @@
  * @param {number[][]} bArr 
  */
 export function drawBricks(ctx, canvasWidth, canvasHeight, bArr) {
-  const rowColors = ["blue", "white", "orange", "pink"];
+  const rowColors = ["blue", "white", "turquoise", "pink"];
   const gap = 2;
   const brickWidth = Math.floor(((canvasWidth - gap) - (bArr[0].length * gap)) / bArr[0].length);
   const brickHeight = Math.floor(canvasHeight * .05);
@@ -71,17 +71,25 @@ export function brickCollision(canvasWidth, canvasHeight, ball, bArr) {
         const row = Math.floor(ball.y / (brickHeight + gap));
         const col = Math.floor(ball.x / (brickWidth + gap));
         // Does brick exist here?
-        if (row <= bArr.length && col <= bArr[0].length && bArr[row][col] !== -1) {
-          ball.velocity.y = -ball.velocity.y;
-          bArr[row][col]--;
-          console.log("turn around")
-          // check for second collision
+        if (row >= 0 && col >= 0 && row <= bArr.length && col <= bArr[0].length ) {
+          if (bArr[row][col] !== -1) {
+            ball.velocity.y = -ball.velocity.y;
+            ball.velocity.x = -ball.velocity.x;
+          //   bArr[row][col]--; Progressive brick changes
+            bArr[row][col] = -1;
+            console.log("turn around")
+          }
+                    // check for second collision
           
           const col2 = Math.floor((ball.x + ball.width) / (brickWidth + gap));
           console.log("col: " + col); 
           console.log("col2: " + col2) 
           if (col2 !== col && col2 <= bArr[0].length && bArr[row][col2] !== -1) {
-            bArr[row][col2]--;
+           // bArr[row][col2]--; Progressive bricks
+           ball.velocity.y = -ball.velocity.y;
+           ball.velocity.x = -ball.velocity.x;
+           bArr[row][col2] = -1;
+            console.log("turn around")
           }
         }
  

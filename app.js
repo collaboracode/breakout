@@ -1,4 +1,4 @@
- import { drawPaddle, paddleFactory, updataPaddle } from "./paddle.js";
+ import { drawPaddle, paddleFactory, updatePaddle } from "./paddle.js";
 import { drawBall, ballFactory, updateBall } from "./ball.js";
 import { drawBricks, generateBricks } from './bricks.js'
 
@@ -10,10 +10,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 /**@type {number} */
-let timestamp = Date.now();
-
-/**@type {number} */
-let deltaTime;
+let lastTime = Date.now();
 
 // /**@type {number} */
 // let velocity = 0;
@@ -25,38 +22,41 @@ let ball;
 
 const bricks = generateBricks(14, 8);
 
-function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  deltaTime = Date.now();
-  /**@type {number} the time that has passed between frames in milliseconds */
-  const delta = timestamp - deltaTime;
-  timestamp = deltaTime;
-
-  // draw the bricks
-  drawBricks(ctx, canvas.width, canvas.height, bricks);
-  
-  // do stuff with paddle object
-  updataPaddle(canvas.width, canvas.height, paddle, delta)
-  drawPaddle(ctx, paddle, canvas.width, canvas.height);
-  updateBall(ball, paddle, {x: canvas.width, y: canvas.height}, delta, bricks)
-  drawBall(ctx, ball)
-  
-  
+function loop(timestamp) {
+  if (ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!paddle) paddle = paddleFactory(canvas.width, canvas.height)
+    if (!ball) ball = ballFactory(canvas.width, canvas.height, paddle)
+    /**@type {number} the time that has passed between frames in milliseconds */
+    const delta = timestamp - lastTime;
+    lastTime = timestamp
+    // draw the bricks
+    drawBricks(ctx, canvas.width, canvas.height, bricks);
+    ctx.font = "32px serif";
+    // do stuff with paddle object
+    updatePaddle(canvas.width, canvas.height, paddle, delta)
+    drawPaddle(ctx, paddle, canvas.width, canvas.height);
+    ctx.fillStyle = "#fff"
+    ctx.fillText(`x: ${Intl.NumberFormat("en-us", {maximumSignificantDigits: 3}).format(ball.velocity.x)} y: ${Intl.NumberFormat("en-us", {maximumSignificantDigits: 3}).format(ball.velocity.y)}`, paddle.x + 15, paddle.y + 50)
+    updateBall(ball, paddle, {x: canvas.width, y: canvas.height}, delta, bricks)
+    drawBall(ctx, ball)
+    
+    
+  }
   // next frame
   requestAnimationFrame(loop);
 }
 
 //* Handlers
 function handleKeyUp(e) {
-  // if (e.code !== && e.code !== )
   switch (e.code) {
     case "ArrowRight":
     case "KeyD":
-      if (paddle.velocity < 0) paddle.velocity = 0;
+      if (paddle.velocity > 0) paddle.velocity = 0;
       break;
     case "ArrowLeft":
     case "KeyA":
-      if (paddle.velocity > 0) paddle.velocity = 0;
+      if (paddle.velocity < 0) paddle.velocity = 0;
       break;
 
   }
@@ -68,17 +68,17 @@ function handleKeyDown(e) {
   switch (e.code) {
     case "ArrowRight":
     case "KeyD":
-      paddle.velocity = -speed;
+      paddle.velocity = speed;
       break;
     case "ArrowLeft":
     case "KeyA":
-      paddle.velocity = speed;
+      paddle.velocity = -speed;
       break;
     case "Space":
       // Launch ball (if it is not moving)
         if (ball.velocity.x === 0 && ball.velocity.y  === 0) {
           ball.velocity.y = ballSpeed
-          ball.velocity.x =  paddle.velocity / 2 // todo refactor to paddle.velocity.x
+          ball.velocity.x =  paddle.velocity / 2
 
 
           console.log('fire! - ' + ball.velocity.x + ' ' + ball.velocity.y)
@@ -99,11 +99,10 @@ function init() {
   addEventListener("keydown", handleKeyDown);
   
   handleResize()
-  paddle = paddleFactory(canvas.width, canvas.height)
-  ball = ballFactory(canvas.width, canvas.height, paddle)
 
-  loop();
+
+  loop(0);
 }
 
 //* start running script
-init()
+init(0)
