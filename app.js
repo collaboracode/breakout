@@ -1,6 +1,6 @@
  import { drawPaddle, paddleFactory, updatePaddle } from "./paddle.js";
 import { drawBall, ballFactory, updateBall } from "./ball.js";
-import { drawBricks, generateBricks } from './bricks.js'
+import { drawBricks, generateBricks, clearBricks } from './bricks.js'
 
 //* Globals
 /**@type {HTMLCanvasElement} */
@@ -65,7 +65,11 @@ function handleKeyUp(e) {
       if (ball.velocity.x != 0) ball.velocity.x = 0;
       if (ball.velocity.y != 0) ball.velocity.y = 0;
       break;
+    case "KeyC":
+      // clear the board temporarily
+      clearBricks(bricks, 14,8);
 
+      break;
   }
 }
 

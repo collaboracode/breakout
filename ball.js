@@ -83,17 +83,18 @@ export function updateBall(ballData, paddleData, bounds, delta, brickArray) {
   if (ballData.y + ballData.height > bounds.y) {
     ballData.velocity.x = 0
     ballData.velocity.y = 0
+    // fail condition
     // ballData.y = bounds.y - ballData.height;
   }
 
-
+  var itr = 0;
   // check for paddle collision
-  if (
+  while (
     ballData.x + ballData.width > paddleData.x 
     && ballData.x  < paddleData.x + paddleData.width
     && ballData.y + ballData.height > paddleData.y 
     ) {
-      ballData.velocity.y = -ballData.velocity.y
+      if (itr == 0) ballData.velocity.y = -ballData.velocity.y
       const newXSpeed = ballData.velocity.x + paddleData.velocity
       if (newXSpeed > ballData.maxSpeed) {
         ballData.velocity.x = ballData.maxSpeed
@@ -105,6 +106,14 @@ export function updateBall(ballData, paddleData, bounds, delta, brickArray) {
         ballData.velocity.x = newXSpeed
       }
 
+      // refresh ball position also
+      ballData.y = ballData.y + (ballData.velocity.y * itr);
+      ballData.x = ballData.x + (ballData.velocity.x * itr);
+      itr++;
+
+      if (itr > 1000) {
+        break;
+      }
     }
 
     brickCollision(bounds.x, bounds.y, ballData, brickArray)

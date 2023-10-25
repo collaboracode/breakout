@@ -27,10 +27,11 @@ export function isColliding(object1, object2) {
     && object1.y + object1.width > object2.y
   )
 }
+/**@typedef {import('./ball.js').Ball} _ball */
 
 /**
  * still need to refine this.
- * @param {_object} object1 
+ * @param {_ball} object1 
  * @param {_object} object2 
  * @returns {"top" | "bottom" | "left" | "right" | false}
  */
@@ -38,17 +39,15 @@ export function whichSide(object1, object2) {
   if (!isColliding(object1, object2)) return false
   
   // top
-  if (object1.y + object1.height < object2.y + (object2.height / 2)) return "top"
+  if (object1.y + object1.height < object2.y + (object2.height / 2) && object1.velocity.y > 0) return "top"
 
   // bottom
-  if (object1.y > object2.y + (object2.height / 2)) return "bottom"
+  if (object1.y > object2.y + (object2.height / 2) && object1.velocity.y < 0) return "bottom"
 
   // left
-  if (object1.x + object1.width < object2.x + (object2.width / 2)) return "left"
+  if (object1.x + object1.width < object2.x + (object2.width / 2) && object1.velocity.x > 0) return "left"
 
   // right
-  if (object1.x > object2.x + (object2.width / 2)) return "right"
-  
-  console.log("or here?")
+  if (object1.x > object2.x + (object2.width / 2) && object1.velocity.x < 0) return "right"  
   return false
 }
