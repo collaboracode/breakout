@@ -50,7 +50,7 @@ export function updatePaddle(canvasWidth, canvasHeight, paddleData, delta) {
 }
 
 /**
- * Creates a paddle object... probably not nessisary, 
+ * Creates a paddle object... probably not necessary, 
  * but this way we can make sure that the functions for it match the data being used
  * @param {number} canvasWidth
  * @param {number} canvasHeight

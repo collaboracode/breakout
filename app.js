@@ -19,6 +19,8 @@ let lastTime = Date.now();
 let paddle;
 /**@typedef {import('./ball.js').Ball} _ball @type {_ball}*/
 let ball;
+/**@typedef {import('./collisionChecks.js')._object} _object*/
+
 
 const bricks = generateBricks(14, 8);
 
@@ -32,7 +34,6 @@ function loop(timestamp) {
     lastTime = timestamp
     // draw the bricks
     drawBricks(ctx, canvas.width, canvas.height, bricks);
-    ctx.font = "32px serif";
     // do stuff with paddle object
     updatePaddle(canvas.width, canvas.height, paddle, delta)
     drawPaddle(ctx, paddle, canvas.width, canvas.height);
@@ -59,6 +60,10 @@ function handleKeyUp(e) {
     case "ArrowLeft":
     case "KeyA":
       if (paddle.velocity < 0) paddle.velocity = 0;
+      break;
+    case "KeyS":
+      if (ball.velocity.x != 0) ball.velocity.x = 0;
+      if (ball.velocity.y != 0) ball.velocity.y = 0;
       break;
 
   }
@@ -102,6 +107,7 @@ function init() {
   
   handleResize()
 
+  ctx.font = "32px serif";
 
   loop(0);
 }
